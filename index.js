@@ -6,24 +6,34 @@ console.log( 'Start...' );
 
 class SiteResourceNotFoundError extends Error {
     
-    constructor( statusCode) {  
+    constructor() {  
         
         super();        
-        
-        this.message = 
-            `Overwatch site resource not found. HTTP status code: ${ statusCode }.`;
+        this.message = 'Overwatch site resource not found.';
     }
+}
+
+function checkStatusCode( code = 200 ) {
+    
+    if ( code === 200 ) {
+        
+        return;
+    }
+    else if ( code === 404 ) {
+        
+        throw new SiteResourceNotFoundError( code );
+    }
+    else {
+        
+        console.log( `Response status code: ${ code }` );
+    }
+    
 }
 
 function handleResponse( response ) {
     
-    let statusCode = response.statusCode;
-    
-    if ( statusCode === 404 ) {
-        
-        throw new SiteResourceNotFoundError( statusCode );
-    }
-    
+    checkStatusCode( response.statusCode );
+
     let rawData = '';
     
     response.on( 'data', ( chunk ) => { 
@@ -36,6 +46,8 @@ function handleResponse( response ) {
         try {
             
             let parsedData = JSON.parse( rawData );
+            
+            console.log( 1, parsedData );
         }
         catch ( error ) {
             
@@ -48,7 +60,7 @@ function handleResponse( response ) {
 function getAccountByName( accountName ) {
     
     let accountByNameUrl = 
-        `https://playoverwatch.com/en-us/search/account-by-name/${ accountName }`;
+        `https://playoverwatch.com/en-us/search/account-by-name1/${ accountName }`;
         
     https
         .get( accountByNameUrl, ( response ) => {
