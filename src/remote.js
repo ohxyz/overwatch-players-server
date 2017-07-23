@@ -1,9 +1,13 @@
-/* Pilot */
+/* Handle remote resources */
 
 const https = require( 'https' );
 
-console.log( 'Start...' );
-
+/**
+ * Define the error when site resouce is not found, eg. a wrong url
+ * 
+ * @override
+ * @this {SiteResourceNotFoundError}
+ */
 class SiteResourceNotFoundError extends Error {
     
     constructor() {  
@@ -13,6 +17,11 @@ class SiteResourceNotFoundError extends Error {
     }
 }
 
+/**
+ * Check HTTP repsonse status code and do things as per status code
+ * 
+ * @param {number} - Standard HTTP status code.
+ */
 function checkStatusCode( code = 200 ) {
     
     if ( code === 200 ) {
@@ -30,7 +39,7 @@ function checkStatusCode( code = 200 ) {
     
 }
 
-function handleResponse( response ) {
+function handleGetAccountByNameResponse( response ) {
     
     checkStatusCode( response.statusCode );
 
@@ -57,17 +66,24 @@ function handleResponse( response ) {
     } );
 }
 
-function getAccountByName( accountName ) {
+/**
+ * Get account info by playerName
+ *
+ * @param {string} - playerName The name of player, case sensitive
+ *                   eg. player1 and Player1 are two players.
+ * @return {undefined}     
+ */
+function getAccountByName( playerName ) {
     
     let accountByNameUrl = 
-        `https://playoverwatch.com/en-us/search/account-by-name1/${ accountName }`;
+        `https://playoverwatch.com/en-us/search/account-by-name/${playerName}`;
         
     https
         .get( accountByNameUrl, ( response ) => {
             
             try {
                 
-                handleResponse( response );
+                handleGetAccountByNameResponse( response );
             }
             catch ( error ) {
                 
@@ -81,6 +97,25 @@ function getAccountByName( accountName ) {
         } );
 }
 
-let accountName = 'ShaDowBurn-2301';
 
-getAccountByName( accountName );
+/**
+ * Get player's data, eg. rank, avatar, eliminations-average, time-played ...
+ *
+ * @param {string} playerName - The name of the player, case sensitive
+ * @param {string} platform - Must be one of pc, psn or xb1
+ * @param {string} region - Must be one of us, eu, kr or global
+ * @return {undefined}
+ */
+function getPlayerData( playerName, platform, region ) {
+    
+    let playerPageUrl = 
+        `https://playoverwatch.com/en-us/career/${platform}/${region}/${playerName}`;
+        
+    
+}
+
+
+module.exports = {
+    
+    getAccountByName
+};
